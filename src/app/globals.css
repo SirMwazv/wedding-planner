@@ -2131,3 +2131,364 @@ tbody tr:last-child td {
     padding: var(--space-md);
   }
 }
+
+/* ─── Landing Page ─── */
+.landing-page {
+  background: var(--color-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  width: 100%;
+}
+
+.landing-header {
+  padding: var(--space-lg) 0;
+  position: sticky;
+  top: 0;
+  background: rgba(247, 248, 247, 0.8);
+  backdrop-filter: blur(12px);
+  z-index: 50;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  color: var(--color-sidebar);
+}
+
+.landing-hero {
+  padding: 120px 0 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-title {
+  font-size: clamp(40px, 8vw, 72px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-lg);
+  color: var(--color-sidebar);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-sidebar) 0%, var(--color-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.hero-subtitle {
+  font-size: clamp(18px, 4vw, 24px);
+  color: var(--color-text-secondary);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.hero-cta {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-2xl);
+  justify-content: center;
+}
+
+/* Hero Image Mockup */
+.hero-image-container {
+  perspective: 1000px;
+  margin-top: 80px;
+  position: relative;
+}
+
+.hero-image-mockup {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.15), 0 30px 60px -30px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transform: rotateX(5deg) scale(0.95);
+  transition: transform 0.5s ease;
+  max-width: 1000px;
+  margin: 0 auto;
+  aspect-ratio: 16/9;
+  position: relative;
+}
+
+.hero-image-mockup:hover {
+  transform: rotateX(0deg) scale(1);
+}
+
+/* Abstract UI Representation */
+.mockup-header {
+  height: 48px;
+  border-bottom: 1px solid var(--color-border-light);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-lg);
+  gap: 8px;
+}
+
+.mockup-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.mockup-dot.red {
+  background: #FF5F56;
+}
+
+.mockup-dot.yellow {
+  background: #FFBD2E;
+}
+
+.mockup-dot.green {
+  background: #27C93F;
+}
+
+.mockup-content {
+  display: flex;
+  height: calc(100% - 48px);
+}
+
+.mockup-sidebar {
+  width: 240px;
+  border-right: 1px solid var(--color-border-light);
+  background: var(--color-sidebar);
+  opacity: 0.95;
+}
+
+.mockup-main {
+  flex: 1;
+  padding: var(--space-xl);
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.mockup-card {
+  height: 160px;
+  background: var(--color-sidebar);
+  border-radius: var(--radius-lg);
+  opacity: 0.8;
+}
+
+.mockup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  flex: 1;
+}
+
+.mockup-stat {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.hero-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 50%, var(--color-bg) 100%);
+  pointer-events: none;
+}
+
+/* Features Section */
+.section-padding {
+  padding: 100px 0;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  color: var(--color-sidebar);
+}
+
+.section-subtitle {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-xl);
+  margin-top: var(--space-2xl);
+}
+
+.feature-card {
+  background: var(--color-bg-card);
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.feature-icon {
+  font-size: 32px;
+  margin-bottom: var(--space-lg);
+  background: var(--color-bg);
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-primary);
+}
+
+.feature-desc {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* Utilities */
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.gap-6 {
+  gap: 24px;
+}
+
+.mt-8 {
+  margin-top: 32px;
+}
+
+.mt-16 {
+  margin-top: 64px;
+}
+
+.mb-6 {
+  margin-bottom: 24px;
+}
+
+.mb-16 {
+  margin-bottom: 64px;
+}
+
+.text-2xl {
+  font-size: 24px;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.tracking-tight {
+  letter-spacing: -0.02em;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+.items-center {
+  align-items: center;
+}
+
+/* ─── Auth Layout ─── */
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-layout-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.auth-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.auth-blob.red {
+  width: 400px;
+  height: 400px;
+  background: var(--color-ceremony-traditional);
+  top: -100px;
+  right: -100px;
+  opacity: 0.15;
+}
+
+.auth-blob.gold {
+  width: 300px;
+  height: 300px;
+  background: var(--color-gold);
+  bottom: -50px;
+  left: -50px;
+  opacity: 0.1;
+}
+
+.auth-blob.green {
+  width: 500px;
+  height: 500px;
+  background: var(--color-sidebar);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.05;
+}
+
+.auth-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-lg);
+}

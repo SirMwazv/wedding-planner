@@ -1,4 +1,4 @@
-import { getCurrentCouple } from '@/lib/supabase/server';
+import { getCurrentCouple, createClient } from '@/lib/supabase/server';
 import CoupleRequired from '@/components/CoupleRequired';
 import { getEvents } from '@/lib/actions/events';
 import { getAllSuppliers } from '@/lib/actions/suppliers';
@@ -19,6 +19,10 @@ const CEREMONY_COLORS: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Partner';
+
     const coupleData = await getCurrentCouple();
     if (!coupleData) return <CoupleRequired />;
 
@@ -94,7 +98,7 @@ export default async function DashboardPage() {
             {/* Welcome Hero */}
             <div className="welcome-hero">
                 <div>
-                    <h3>Welcome back, Thandiwe</h3>
+                    <h3>Welcome back, {displayName}</h3>
                     <p>You have {pendingTasks} pending tasks and {upcomingPayments.length} upcoming payments this month.</p>
                 </div>
                 {daysUntil !== null && (
@@ -207,9 +211,9 @@ export default async function DashboardPage() {
                                         <div className="list-item-subtitle">{s.category || 'Uncategorized'}</div>
                                     </div>
                                     <span className={`badge ${s.status === 'booked' ? 'badge-success' :
-                                            s.status === 'negotiating' ? 'badge-warning' :
-                                                s.status === 'rejected' ? 'badge-danger' :
-                                                    'badge-info'
+                                        s.status === 'negotiating' ? 'badge-warning' :
+                                            s.status === 'rejected' ? 'badge-danger' :
+                                                'badge-info'
                                         }`}>
                                         <span className="badge-dot" />
                                         {s.status.charAt(0).toUpperCase() + s.status.slice(1)}

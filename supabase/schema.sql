@@ -101,12 +101,19 @@ create policy "Users can view their own memberships"
   on public.couple_members for select
   using (user_id = auth.uid());
 
+create or replace function public.get_my_couple_ids()
+returns setof uuid as $$
+begin
+  return query
+  select couple_id from public.couple_members
+  where user_id = auth.uid();
+end;
+$$ language plpgsql security definer stable;
+
 create policy "Users can view co-members"
   on public.couple_members for select
   using (
-    couple_id in (
-      select couple_id from public.couple_members where user_id = auth.uid()
-    )
+    couple_id in ( select public.get_my_couple_ids() )
   );
 
 create policy "Authenticated users can create memberships"

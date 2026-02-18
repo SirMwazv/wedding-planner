@@ -12,8 +12,12 @@ export async function GET(request: Request) {
         if (!error) {
             return NextResponse.redirect(`${origin}${next}`);
         }
+        console.error('[auth/callback] Code exchange failed:', error.message);
     }
 
-    // Auth code error — redirect to login
-    return NextResponse.redirect(`${origin}/auth/login`);
+    // Auth code error — redirect to login with error hint
+    const redirectUrl = new URL('/auth/login', origin);
+    redirectUrl.searchParams.set('error', 'auth_callback_failed');
+    return NextResponse.redirect(redirectUrl.toString());
 }
+

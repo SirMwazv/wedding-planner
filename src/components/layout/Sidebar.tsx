@@ -5,7 +5,12 @@ import { usePathname } from 'next/navigation';
 import { signOut } from '@/lib/actions/auth';
 import ThemeToggle from '@/components/ThemeToggle';
 
-export default function Sidebar() {
+interface SidebarProps {
+    coupleName?: string;
+    weddingDate?: string;
+}
+
+export default function Sidebar({ coupleName, weddingDate }: SidebarProps) {
     const pathname = usePathname();
 
     const navItems = [
@@ -35,8 +40,8 @@ export default function Sidebar() {
             <div className="event-selector">
                 <div className="event-selector-dot" />
                 <div className="event-selector-info">
-                    <div className="event-selector-name">White Wedding</div>
-                    <div className="event-selector-date">2025 · 06 · 21</div>
+                    <div className="event-selector-name">{coupleName || 'My Wedding'}</div>
+                    <div className="event-selector-date">{weddingDate || 'Date not set'}</div>
                 </div>
                 <span className="event-selector-chevron">▾</span>
             </div>
