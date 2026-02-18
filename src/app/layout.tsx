@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: "Roora — Cultural Wedding Planning",
   description: "A wedding operating system for African and multi-ceremony weddings. Manage lobola, traditional weddings, kitchen parties, and more.",
