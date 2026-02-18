@@ -4,6 +4,12 @@ import { useState } from 'react';
 import { updateTask } from '@/lib/actions/tasks';
 import { useRouter } from 'next/navigation';
 
+interface Member {
+    id: string;
+    role: string;
+    display_name: string;
+}
+
 interface TaskEditProps {
     task: {
         id: string;
@@ -12,10 +18,11 @@ interface TaskEditProps {
         due_date: string | null;
         assigned_to: string | null;
     };
+    members: Member[];
     onClose: () => void;
 }
 
-export default function TaskEdit({ task, onClose }: TaskEditProps) {
+export default function TaskEdit({ task, members, onClose }: TaskEditProps) {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -77,14 +84,19 @@ export default function TaskEdit({ task, onClose }: TaskEditProps) {
                         </div>
                         <div className="form-group">
                             <label className="form-label" htmlFor="edit_assigned_to">Assigned To</label>
-                            <input
+                            <select
                                 id="edit_assigned_to"
                                 name="assigned_to"
-                                type="text"
-                                className="form-input"
+                                className="form-input form-select"
                                 defaultValue={task.assigned_to || ''}
-                                placeholder="e.g. Bride"
-                            />
+                            >
+                                <option value="">Unassigned</option>
+                                {members.map((m) => (
+                                    <option key={m.id} value={m.id}>
+                                        {m.display_name} ({m.role})
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
 

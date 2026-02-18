@@ -5,6 +5,12 @@ import { deleteTask } from '@/lib/actions/tasks';
 import { useRouter } from 'next/navigation';
 import TaskEdit from './TaskEdit';
 
+interface Member {
+    id: string;
+    role: string;
+    display_name: string;
+}
+
 interface TaskItemActionsProps {
     task: {
         id: string;
@@ -13,9 +19,10 @@ interface TaskItemActionsProps {
         due_date: string | null;
         assigned_to: string | null;
     };
+    members: Member[];
 }
 
-export default function TaskItemActions({ task }: TaskItemActionsProps) {
+export default function TaskItemActions({ task, members }: TaskItemActionsProps) {
     const [showEdit, setShowEdit] = useState(false);
     const [confirming, setConfirming] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -74,7 +81,7 @@ export default function TaskItemActions({ task }: TaskItemActionsProps) {
             </div>
 
             {showEdit && (
-                <TaskEdit task={task} onClose={() => setShowEdit(false)} />
+                <TaskEdit task={task} members={members} onClose={() => setShowEdit(false)} />
             )}
         </>
     );

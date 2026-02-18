@@ -1,4 +1,4 @@
-import { getCurrentCouple } from '@/lib/supabase/server';
+import { getCurrentCouple, getCoupleMembers } from '@/lib/supabase/server';
 import CoupleRequired from '@/components/CoupleRequired';
 import { getEvents } from '@/lib/actions/events';
 import { getAllTasks } from '@/lib/actions/tasks';
@@ -40,6 +40,13 @@ export default async function TasksPage() {
 
     const events = await getEvents() as EventInfo[];
     const tasks = await getAllTasks() as Task[];
+    const members = await getCoupleMembers();
+
+    // Build lookup: userId -> display_name
+    const memberMap: Record<string, string> = {};
+    members.forEach((m) => {
+        memberMap[m.id] = m.display_name;
+    });
 
     // Stats
     const totalTasks = tasks.length;
@@ -72,7 +79,7 @@ export default async function TasksPage() {
                     <p>Manage your wedding planning checklist</p>
                 </div>
                 <div className="page-header-actions">
-                    <TaskActions events={events.map((e) => ({ id: e.id, name: e.name }))} />
+                    <TaskActions events={events.map((e) => ({ id: e.id, name: e.name }))} members={members} />
                 </div>
             </div>
 
@@ -143,7 +150,7 @@ export default async function TasksPage() {
                                                 </div>
                                                 <div className="task-meta">
                                                     {task.assigned_to && (
-                                                        <span className="badge badge-category">{task.assigned_to}</span>
+                                                        <span className="badge badge-category">{memberMap[task.assigned_to] || task.assigned_to}</span>
                                                     )}
                                                     {task.due_date && (
                                                         <span className={`text-sm ${isOverdue ? 'text-outstanding' : 'text-muted'}`}>
@@ -154,7 +161,7 @@ export default async function TasksPage() {
                                                         <span className="badge badge-priority-high">Overdue</span>
                                                     )}
                                                 </div>
-                                                <TaskItemActions task={task} />
+                                                <TaskItemActions task={task} members={members} />
                                             </div>
                                         );
                                     })}

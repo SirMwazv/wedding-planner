@@ -3,11 +3,18 @@
 import { useState } from 'react';
 import { createTask } from '@/lib/actions/tasks';
 
-interface TaskActionsProps {
-    events: { id: string; name: string }[];
+interface Member {
+    id: string;
+    role: string;
+    display_name: string;
 }
 
-export default function TaskActions({ events }: TaskActionsProps) {
+interface TaskActionsProps {
+    events: { id: string; name: string }[];
+    members: Member[];
+}
+
+export default function TaskActions({ events, members }: TaskActionsProps) {
     const [showForm, setShowForm] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -78,13 +85,14 @@ export default function TaskActions({ events }: TaskActionsProps) {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="assigned_to">Assigned To</label>
-                                    <input
-                                        id="assigned_to"
-                                        name="assigned_to"
-                                        type="text"
-                                        className="form-input"
-                                        placeholder="e.g. Bride"
-                                    />
+                                    <select id="assigned_to" name="assigned_to" className="form-input form-select">
+                                        <option value="">Unassigned</option>
+                                        {members.map((m) => (
+                                            <option key={m.id} value={m.id}>
+                                                {m.display_name} ({m.role})
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 

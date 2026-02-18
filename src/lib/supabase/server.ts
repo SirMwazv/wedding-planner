@@ -52,3 +52,24 @@ export async function getCurrentCouple() {
         userId: user.id,
     };
 }
+
+/**
+ * Get all members of the current couple, with display names.
+ * Used for task assignment dropdowns.
+ */
+export async function getCoupleMembers() {
+    const couple = await getCurrentCouple();
+    if (!couple) return [];
+
+    const supabase = await createClient();
+    const { data } = await supabase
+        .from('couple_members')
+        .select('user_id, role, profiles(display_name)')
+        .eq('couple_id', couple.couple.id);
+
+    return (data || []).map((m) => ({
+        id: m.user_id,
+        role: m.role as string,
+        display_name: (m.profiles as unknown as { display_name: string } | null)?.display_name || m.role,
+    }));
+}
