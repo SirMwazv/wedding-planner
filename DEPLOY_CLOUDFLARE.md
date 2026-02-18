@@ -44,6 +44,7 @@ I have made the following changes to prepare your project:
 
 ## Troubleshooting
 
+-   **Dependency Errors (ERESOLVE)**: If you see peer dependency errors during build, I have added an `.npmrc` file to handle this. If it persists, set an Environment Variable `NPM_FLAGS` to `--legacy-peer-deps` in Cloudflare settings.
 -   **"Image Optimization" Errors**: Ensuring `images: { unoptimized: true }` in `next.config.ts` resolves this.
 -   **"Node.js Compatibility" Errors**: Ensure `nodejs_compat` is enabled.
 -   **Database Connection**: Supabase works fine over HTTP. Ensure your environment variables are correct.
