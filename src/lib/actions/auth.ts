@@ -146,11 +146,9 @@ export async function joinWedding(formData: FormData) {
         return { error: 'Invite code is required' };
     }
 
-    // 1. Find the couple by invite code
+    // 1. Find the couple by invite code (using RPC to bypass RLS)
     const { data: couple, error: findError } = await supabase
-        .from('couples')
-        .select('id, name')
-        .eq('invite_code', inviteCode.trim())
+        .rpc('get_couple_by_invite_code', { code_input: inviteCode.trim() })
         .single();
 
     if (findError || !couple) {
