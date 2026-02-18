@@ -127,3 +127,62 @@ export async function createWedding(formData: FormData) {
 
     redirect('/dashboard');
 }
+
+/**
+ * Join an existing wedding using an invite code.
+ */
+export async function joinWedding(formData: FormData) {
+    const supabase = await createClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        return { error: 'Not authenticated' };
+    }
+
+    const inviteCode = formData.get('invite_code') as string;
+    const role = (formData.get('role') as MemberRole) || 'planner';
+
+    if (!inviteCode) {
+        return { error: 'Invite code is required' };
+    }
+
+    // 1. Find the couple by invite code
+    const { data: couple, error: findError } = await supabase
+        .from('couples')
+        .select('id, name')
+        .eq('invite_code', inviteCode.trim())
+        .single();
+
+    if (findError || !couple) {
+        return { error: 'Invalid invite code. Please check and try again.' };
+    }
+
+    // 2. Check if already a member
+    const { data: existingMember } = await supabase
+        .from('couple_members')
+        .select('id')
+        .eq('couple_id', couple.id)
+        .eq('user_id', user.id)
+        .single();
+
+    if (existingMember) {
+        // Already a member, just redirect
+        redirect('/dashboard');
+    }
+
+    // 3. Add to couple
+    const { error: joinError } = await supabase
+        .from('couple_members')
+        .insert({
+            couple_id: couple.id,
+            user_id: user.id,
+            role,
+        });
+
+    if (joinError) {
+        console.error('Join error:', joinError);
+        return { error: `Failed to join wedding: ${joinError.message}` };
+    }
+
+    redirect('/dashboard');
+}

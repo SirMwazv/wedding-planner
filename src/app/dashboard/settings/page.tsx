@@ -35,6 +35,15 @@ export default async function SettingsPage() {
                         </div>
                         <div className="list-item">
                             <div className="list-item-content">
+                                <div className="list-item-subtitle">Partner Invite Code</div>
+                                <div className="list-item-title flex items-center gap-2">
+                                    <code className="bg-gray-100 px-2 py-1 rounded font-mono text-primary font-bold">{couple.invite_code || 'No code generated'}</code>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">Share this code with your partner to join this wedding.</p>
+                            </div>
+                        </div>
+                        <div className="list-item">
+                            <div className="list-item-content">
                                 <div className="list-item-subtitle">Currency</div>
                                 <div className="list-item-title">{couple.primary_currency}</div>
                             </div>
