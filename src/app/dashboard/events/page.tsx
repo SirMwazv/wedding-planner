@@ -6,6 +6,8 @@ import { getAllTasks } from '@/lib/actions/tasks';
 import { formatCurrency } from '@/lib/utils/currency';
 import Link from 'next/link';
 import type { Currency, Quote, Supplier } from '@/lib/types/database';
+import SuccessToast from '@/components/SuccessToast';
+import { Suspense } from 'react';
 
 const CEREMONY_COLORS: Record<string, string> = {
     white_wedding: 'green',
@@ -46,6 +48,7 @@ export default async function EventsPage() {
 
     return (
         <>
+            <Suspense><SuccessToast /></Suspense>
             <div className="page-header">
                 <div>
                     <h2>Events</h2>

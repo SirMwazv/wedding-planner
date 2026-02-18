@@ -6,6 +6,8 @@ import { formatCurrency } from '@/lib/utils/currency';
 import Link from 'next/link';
 import type { Currency, Quote, Supplier, SupplierStatus } from '@/lib/types/database';
 import SupplierTable from './SupplierTable';
+import SuccessToast from '@/components/SuccessToast';
+import { Suspense } from 'react';
 
 export default async function SuppliersPage() {
     const coupleData = await getCurrentCouple();
@@ -49,6 +51,7 @@ export default async function SuppliersPage() {
 
     return (
         <>
+            <Suspense><SuccessToast /></Suspense>
             <div className="page-header">
                 <div>
                     <h2>Suppliers</h2>

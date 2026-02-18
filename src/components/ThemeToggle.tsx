@@ -8,7 +8,7 @@ export default function ThemeToggle() {
 
     useEffect(() => {
         setMounted(true);
-        const stored = localStorage.getItem('roora-theme') as 'light' | 'dark' | null;
+        const stored = localStorage.getItem('this-is-us-theme') as 'light' | 'dark' | null;
         const initial = stored || 'light';
         setTheme(initial);
         document.documentElement.setAttribute('data-theme', initial);
@@ -18,7 +18,7 @@ export default function ThemeToggle() {
         const next = theme === 'light' ? 'dark' : 'light';
         setTheme(next);
         document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('roora-theme', next);
+        localStorage.setItem('this-is-us-theme', next);
     }
 
     if (!mounted) return null;

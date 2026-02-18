@@ -4,6 +4,7 @@ import { getEvent, getEventSuppliers, getEventTasks } from '@/lib/actions/events
 import { formatCurrency, formatDate } from '@/lib/utils/currency';
 import Link from 'next/link';
 import type { Currency, Quote, Supplier } from '@/lib/types/database';
+import EventActions from './EventActions';
 
 const CEREMONY_COLORS: Record<string, string> = {
     white_wedding: 'green', traditional: 'orange', kitchen_party: 'purple',
@@ -45,6 +46,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     <p>{event.type.replace(/_/g, ' ')} · {daysUntil !== null ? `${daysUntil} days away` : 'No date set'}</p>
                 </div>
                 <div className="page-header-actions">
+                    <EventActions eventId={id} />
                     <Link href={`/dashboard/suppliers/new?event_id=${id}`} className="btn btn-primary">+ Add Supplier</Link>
                 </div>
             </div>

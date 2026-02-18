@@ -57,7 +57,7 @@ export async function createSupplier(formData: FormData) {
 
     if (error) return { error: error.message };
 
-    redirect('/dashboard/suppliers');
+    redirect('/dashboard/suppliers?success=created');
 }
 
 export async function updateSupplier(id: string, formData: FormData) {
@@ -89,5 +89,5 @@ export async function deleteSupplier(id: string) {
     const supabase = await createClient();
     const { error } = await supabase.from('suppliers').delete().eq('id', id);
     if (error) return { error: error.message };
-    redirect('/dashboard/suppliers');
+    redirect('/dashboard/suppliers?success=deleted');
 }

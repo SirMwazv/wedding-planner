@@ -48,7 +48,7 @@ export async function createEvent(formData: FormData) {
 
     if (error) return { error: error.message };
 
-    redirect('/dashboard/events');
+    redirect('/dashboard/events?success=created');
 }
 
 export async function updateEvent(id: string, formData: FormData) {
@@ -70,14 +70,14 @@ export async function updateEvent(id: string, formData: FormData) {
 
     if (error) return { error: error.message };
 
-    redirect(`/dashboard/events`);
+    redirect(`/dashboard/events?success=updated`);
 }
 
 export async function deleteEvent(id: string) {
     const supabase = await createClient();
     const { error } = await supabase.from('events').delete().eq('id', id);
     if (error) return { error: error.message };
-    redirect('/dashboard/events');
+    redirect('/dashboard/events?success=deleted');
 }
 
 export async function getEventSuppliers(eventId: string) {

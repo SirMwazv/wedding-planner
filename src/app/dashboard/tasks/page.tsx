@@ -6,6 +6,9 @@ import { formatDate } from '@/lib/utils/currency';
 import TaskActions from './TaskActions';
 import TaskCheckbox from './TaskCheckbox';
 import type { TaskStatus } from '@/lib/types/database';
+import TaskDelete from './TaskDelete';
+import SuccessToast from '@/components/SuccessToast';
+import { Suspense } from 'react';
 
 const CEREMONY_COLORS: Record<string, string> = {
     white_wedding: 'var(--color-ceremony-white)',
@@ -62,6 +65,7 @@ export default async function TasksPage() {
 
     return (
         <>
+            <Suspense><SuccessToast /></Suspense>
             <div className="page-header">
                 <div>
                     <h2>Tasks</h2>
@@ -150,6 +154,7 @@ export default async function TasksPage() {
                                                         <span className="badge badge-priority-high">Overdue</span>
                                                     )}
                                                 </div>
+                                                <TaskDelete taskId={task.id} />
                                             </div>
                                         );
                                     })}

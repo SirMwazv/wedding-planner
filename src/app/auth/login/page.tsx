@@ -23,7 +23,7 @@ export default function LoginPage() {
             <div className="text-center mb-8">
                 <Link href="/" className="inline-flex items-center gap-2 text-sidebar hover:opacity-80 transition-opacity mb-4">
                     <span className="text-2xl">💍</span>
-                    <span className="font-bold text-xl tracking-tight">Roora</span>
+                    <span className="font-bold text-xl tracking-tight">This Is Us</span>
                 </Link>
                 <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
                 <p className="text-gray-500 text-sm mt-1">Sign in to continue planning</p>

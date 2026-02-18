@@ -1,5 +1,5 @@
 // ============================================================
-// Roora — TypeScript Types (mirrors database schema)
+// This Is Us — TypeScript Types (mirrors database schema)
 // ============================================================
 
 export type MemberRole = 'bride' | 'groom' | 'planner' | 'family';

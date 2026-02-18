@@ -1,10 +1,11 @@
-import { getSupplier } from '@/lib/actions/suppliers';
+import { getSupplier, deleteSupplier } from '@/lib/actions/suppliers';
 import { SUPPLIER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '@/lib/types/database';
 import { formatCurrency, formatDate, formatRelativeDate } from '@/lib/utils/currency';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { SupplierStatus, Currency, PaymentMethod } from '@/lib/types/database';
 import SupplierActions from './SupplierActions';
+import DeleteButton from '@/components/DeleteButton';
 
 const STATUS_BADGE: Record<string, string> = {
     researching: 'badge-default',
@@ -75,6 +76,9 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
                             {SUPPLIER_STATUS_LABELS[s.status]}
                         </span>
                     </p>
+                </div>
+                <div className="page-header-actions">
+                    <DeleteButton onDelete={() => deleteSupplier(s.id)} itemName="this supplier" />
                 </div>
             </div>
 

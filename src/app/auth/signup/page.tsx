@@ -33,7 +33,7 @@ export default function SignupPage() {
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-2 text-sidebar hover:opacity-80 transition-opacity mb-4">
                         <span className="text-2xl">💍</span>
-                        <span className="font-bold text-xl tracking-tight">Roora</span>
+                        <span className="font-bold text-xl tracking-tight">This Is Us</span>
                     </Link>
                 </div>
                 <div className="bg-success-bg border border-success text-success-text rounded-lg p-6 text-center">
@@ -52,7 +52,7 @@ export default function SignupPage() {
             <div className="text-center mb-8">
                 <Link href="/" className="inline-flex items-center gap-2 text-sidebar hover:opacity-80 transition-opacity mb-4">
                     <span className="text-2xl">💍</span>
-                    <span className="font-bold text-xl tracking-tight">Roora</span>
+                    <span className="font-bold text-xl tracking-tight">This Is Us</span>
                 </Link>
                 <h2 className="text-2xl font-bold text-gray-900">Get started</h2>
                 <p className="text-gray-500 text-sm mt-1">Plan your cultural wedding, your way</p>

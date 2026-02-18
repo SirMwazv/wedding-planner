@@ -34,7 +34,7 @@ export default function Sidebar({ coupleName, weddingDate }: SidebarProps) {
         <aside className="sidebar">
             <div className="sidebar-brand">
                 <div className="sidebar-brand-icon">💍</div>
-                <h1>Roora</h1>
+                <h1>This Is Us</h1>
             </div>
 
             <div className="event-selector">

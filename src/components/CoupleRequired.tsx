@@ -36,7 +36,7 @@ export default function CoupleRequired() {
                 <h2>{mode === 'create' ? 'Create Your Wedding' : 'Join a Wedding'}</h2>
                 <p>
                     {mode === 'create'
-                        ? "Welcome to Roora! Let's set up your wedding planning space."
+                        ? "Welcome to This Is Us! Let's set up your wedding planning space."
                         : "Enter the invite code from your partner to join their wedding planning space."}
                 </p>
 

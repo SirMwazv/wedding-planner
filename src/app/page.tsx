@@ -29,7 +29,7 @@ export default async function LandingPage({
         <div className="landing-container flex-between">
           <div className="landing-brand">
             <span className="text-2xl mr-2">💍</span>
-            <span className="font-bold text-xl tracking-tight">Roora</span>
+            <span className="font-bold text-xl tracking-tight">This Is Us</span>
           </div>
           <nav className="landing-nav flex gap-6 items-center">
             {user ? (
@@ -137,7 +137,7 @@ export default async function LandingPage({
             <span className="text-2xl">💍</span>
           </div>
           <p className="text-secondary text-sm mb-6">
-            © {new Date().getFullYear()} Roora. Built for love and heritage.
+            © {new Date().getFullYear()} This Is Us. Built for love and heritage.
           </p>
           <div className="flex justify-center gap-6 text-secondary text-sm">
             <Link href="#">Privacy</Link>
