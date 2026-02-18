@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/utils/currency';
 import TaskActions from './TaskActions';
 import TaskCheckbox from './TaskCheckbox';
 import type { TaskStatus } from '@/lib/types/database';
-import TaskDelete from './TaskDelete';
+import TaskItemActions from './TaskItemActions';
 import SuccessToast from '@/components/SuccessToast';
 import { Suspense } from 'react';
 
@@ -154,7 +154,7 @@ export default async function TasksPage() {
                                                         <span className="badge badge-priority-high">Overdue</span>
                                                     )}
                                                 </div>
-                                                <TaskDelete taskId={task.id} />
+                                                <TaskItemActions task={task} />
                                             </div>
                                         );
                                     })}

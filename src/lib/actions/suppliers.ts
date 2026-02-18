@@ -82,7 +82,7 @@ export async function updateSupplier(id: string, formData: FormData) {
 
     if (error) return { error: error.message };
 
-    redirect(`/dashboard/suppliers/${id}`);
+    redirect(`/dashboard/suppliers/${id}?success=updated`);
 }
 
 export async function deleteSupplier(id: string) {

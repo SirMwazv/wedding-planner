@@ -78,6 +78,7 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
                     </p>
                 </div>
                 <div className="page-header-actions">
+                    <Link href={`/dashboard/suppliers/${s.id}/edit`} className="btn btn-secondary">✏️ Edit</Link>
                     <DeleteButton onDelete={() => deleteSupplier(s.id)} itemName="this supplier" />
                 </div>
             </div>

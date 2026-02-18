@@ -56,6 +56,24 @@ export async function updateTaskStatus(id: string, status: TaskStatus) {
     if (error) return { error: error.message };
     return { success: true };
 }
+export async function updateTask(id: string, formData: FormData) {
+    const supabase = await createClient();
+
+    const updates = {
+        title: formData.get('title') as string,
+        description: (formData.get('description') as string) || null,
+        due_date: (formData.get('due_date') as string) || null,
+        assigned_to: (formData.get('assigned_to') as string) || null,
+    };
+
+    const { error } = await supabase
+        .from('tasks')
+        .update(updates)
+        .eq('id', id);
+
+    if (error) return { error: error.message };
+    return { success: true };
+}
 
 export async function deleteTask(id: string) {
     const supabase = await createClient();
