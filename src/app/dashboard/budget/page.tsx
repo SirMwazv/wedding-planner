@@ -5,6 +5,7 @@ import { getAllSuppliers } from '@/lib/actions/suppliers';
 import { formatCurrency } from '@/lib/utils/currency';
 import Link from 'next/link';
 import type { Currency, Quote, Supplier } from '@/lib/types/database';
+import BudgetActions from './BudgetActions';
 
 export default async function BudgetPage() {
     const coupleData = await getCurrentCouple();
@@ -12,30 +13,32 @@ export default async function BudgetPage() {
 
     const { couple } = coupleData;
     const currency = couple.primary_currency as Currency;
+    const setBudget = Number(couple.total_budget) || 0;
     const events = await getEvents();
     const suppliers = await getAllSuppliers();
 
     // Totals
-    const totalBudget = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
+    const totalQuoted = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
         sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.amount), 0), 0);
     const totalPaid = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
         sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_paid), 0), 0);
-    const totalCommitted = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-        sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_required), 0), 0);
-    const remaining = totalBudget - totalCommitted;
-    const committedPercent = totalBudget > 0 ? Math.round((totalCommitted / totalBudget) * 100) : 0;
-    const paidPercent = totalBudget > 0 ? Math.round((totalPaid / totalBudget) * 100) : 0;
-    const remainingPercent = totalBudget > 0 ? Math.round((remaining / totalBudget) * 100) : 0;
+    const outstanding = totalQuoted - totalPaid;
+
+    // Budget tracking
+    const budgetSet = setBudget > 0;
+    const remaining = budgetSet ? setBudget - totalQuoted : 0;
+    const overBudget = budgetSet && totalQuoted > setBudget;
+    const quotedPercent = budgetSet ? Math.min(Math.round((totalQuoted / setBudget) * 100), 100) : 0;
+    const paidPercent = budgetSet ? Math.min(Math.round((totalPaid / setBudget) * 100), 100) : 0;
 
     // Category breakdown
-    const categoryMap: Record<string, { quoted: number; paid: number; budget: number }> = {};
+    const categoryMap: Record<string, { quoted: number; paid: number }> = {};
     suppliers.forEach((s: Supplier & { quotes?: Quote[] }) => {
         const cat = s.category || 'Other';
-        if (!categoryMap[cat]) categoryMap[cat] = { quoted: 0, paid: 0, budget: 0 };
+        if (!categoryMap[cat]) categoryMap[cat] = { quoted: 0, paid: 0 };
         (s.quotes || []).forEach((q: Quote) => {
             categoryMap[cat].quoted += Number(q.amount) || 0;
             categoryMap[cat].paid += Number(q.deposit_paid) || 0;
-            categoryMap[cat].budget += Number(q.amount) || 0;
         });
     });
 
@@ -43,18 +46,18 @@ export default async function BudgetPage() {
         .map(([name, data]) => ({
             name,
             ...data,
-            percent: data.budget > 0 ? Math.round((data.paid / data.budget) * 100) : 0,
+            percent: data.quoted > 0 ? Math.round((data.paid / data.quoted) * 100) : 0,
         }))
-        .sort((a, b) => b.budget - a.budget);
+        .sort((a, b) => b.quoted - a.quoted);
 
     // Per-event breakdown
     const eventBudgets = events.map((e: { id: string; name: string; type: string }) => {
         const eventSuppliers = suppliers.filter((s: { event_id: string }) => s.event_id === e.id);
-        const budget = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
+        const quoted = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
             sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.amount), 0), 0);
         const paid = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
             sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_paid), 0), 0);
-        return { id: e.id, name: e.name, budget, paid, type: e.type };
+        return { id: e.id, name: e.name, quoted, paid, type: e.type };
     });
 
     return (
@@ -64,75 +67,99 @@ export default async function BudgetPage() {
                     <h2>Budget</h2>
                     <p>Financial overview across all events</p>
                 </div>
+                <div className="page-header-actions">
+                    <BudgetActions currentBudget={setBudget} currencySymbol={currency} />
+                </div>
             </div>
 
-            {/* Tabs */}
-            <div className="tabs">
-                <button className="tab active">All Events</button>
-                {events.map((e: { id: string; name: string }) => (
-                    <button key={e.id} className="tab">{e.name}</button>
-                ))}
-            </div>
+            {/* Budget Alert */}
+            {!budgetSet && (
+                <div className="panel" style={{ borderLeft: '4px solid var(--color-gold)', marginBottom: 'var(--space-lg)' }}>
+                    <div className="panel-body">
+                        <p style={{ margin: 0 }}>
+                            <strong>🎯 No budget set yet.</strong> Click &quot;Set Budget&quot; above to define your wedding budget and start tracking costs against it.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {overBudget && (
+                <div className="panel" style={{ borderLeft: '4px solid var(--color-danger)', marginBottom: 'var(--space-lg)' }}>
+                    <div className="panel-body">
+                        <p style={{ margin: 0 }}>
+                            <strong>⚠️ Over budget!</strong> Your quoted costs exceed your set budget by {formatCurrency(totalQuoted - setBudget, currency)}.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Stat Cards */}
             <div className="stats-grid">
                 <div className="stat-card">
-                    <div className="stat-icon">💰</div>
-                    <div className="stat-value">{formatCurrency(totalBudget, currency)}</div>
-                    <div className="stat-label">Total Budget</div>
-                    <div className="stat-subtitle">Planned total</div>
+                    <div className="stat-icon">🎯</div>
+                    <div className="stat-value">{budgetSet ? formatCurrency(setBudget, currency) : '—'}</div>
+                    <div className="stat-label">Set Budget</div>
+                    <div className="stat-subtitle">{budgetSet ? 'Your target' : 'Not set yet'}</div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">📌</div>
-                    <div className="stat-value" style={{ color: 'var(--color-committed)' }}>{formatCurrency(totalCommitted, currency)}</div>
-                    <div className="stat-label">Committed</div>
-                    <div className="stat-subtitle">{committedPercent}% of budget</div>
+                    <div className="stat-icon">📋</div>
+                    <div className="stat-value" style={{ color: overBudget ? 'var(--color-danger)' : 'var(--color-committed)' }}>
+                        {formatCurrency(totalQuoted, currency)}
+                    </div>
+                    <div className="stat-label">Total Quoted</div>
+                    <div className="stat-subtitle">{budgetSet ? `${quotedPercent}% of budget` : 'From supplier quotes'}</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-icon">✅</div>
                     <div className="stat-value" style={{ color: 'var(--color-paid)' }}>{formatCurrency(totalPaid, currency)}</div>
-                    <div className="stat-label">Paid Out</div>
-                    <div className="stat-subtitle">{paidPercent}% of budget</div>
+                    <div className="stat-label">Actual Paid</div>
+                    <div className="stat-subtitle">{budgetSet ? `${paidPercent}% of budget` : `${formatCurrency(outstanding, currency)} outstanding`}</div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">💵</div>
-                    <div className="stat-value">{formatCurrency(remaining, currency)}</div>
-                    <div className="stat-label">Remaining</div>
-                    <div className="stat-subtitle">Unallocated</div>
+                    <div className="stat-icon">{overBudget ? '🔴' : '💵'}</div>
+                    <div className="stat-value" style={{ color: overBudget ? 'var(--color-danger)' : undefined }}>
+                        {budgetSet ? formatCurrency(Math.abs(remaining), currency) : formatCurrency(outstanding, currency)}
+                    </div>
+                    <div className="stat-label">{overBudget ? 'Over Budget' : (budgetSet ? 'Remaining' : 'Outstanding')}</div>
+                    <div className="stat-subtitle">{budgetSet ? (overBudget ? 'Quoted exceeds budget' : 'Budget − quoted') : 'Quoted − paid'}</div>
                 </div>
             </div>
 
             {/* Budget Health */}
-            <div className="panel">
-                <div className="panel-header">
-                    <div className="panel-title">Budget Health</div>
-                    <div className="health-bar-legend">
-                        <div className="health-bar-legend-item">
-                            <div className="health-bar-legend-dot" style={{ background: 'var(--color-paid)' }} />
-                            Paid
+            {budgetSet && (
+                <div className="panel">
+                    <div className="panel-header">
+                        <div className="panel-title">Budget Health</div>
+                        <div className="health-bar-legend">
+                            <div className="health-bar-legend-item">
+                                <div className="health-bar-legend-dot" style={{ background: 'var(--color-paid)' }} />
+                                Paid
+                            </div>
+                            <div className="health-bar-legend-item">
+                                <div className="health-bar-legend-dot" style={{ background: 'var(--color-committed)' }} />
+                                Quoted
+                            </div>
+                            <div className="health-bar-legend-item">
+                                <div className="health-bar-legend-dot" style={{ background: 'var(--color-border-light)' }} />
+                                Remaining
+                            </div>
                         </div>
-                        <div className="health-bar-legend-item">
-                            <div className="health-bar-legend-dot" style={{ background: 'var(--color-committed)' }} />
-                            Committed
+                    </div>
+                    <div className="panel-body">
+                        <div className="health-bar">
+                            <div className="health-bar-segment paid" style={{ width: `${paidPercent}%` }} />
+                            <div className="health-bar-segment committed" style={{ width: `${Math.max(0, quotedPercent - paidPercent)}%` }} />
                         </div>
-                        <div className="health-bar-legend-item">
-                            <div className="health-bar-legend-dot" style={{ background: 'var(--color-border-light)' }} />
-                            Remaining
+                        <div className="health-bar-labels">
+                            <span>{formatCurrency(0, currency)}</span>
+                            <span>
+                                {formatCurrency(totalPaid, currency)} paid · {formatCurrency(outstanding, currency)} outstanding
+                            </span>
+                            <span>{formatCurrency(setBudget, currency)}</span>
                         </div>
                     </div>
                 </div>
-                <div className="panel-body">
-                    <div className="health-bar">
-                        <div className="health-bar-segment paid" style={{ width: `${paidPercent}%` }} />
-                        <div className="health-bar-segment committed" style={{ width: `${committedPercent - paidPercent}%` }} />
-                    </div>
-                    <div className="health-bar-labels">
-                        <span>{formatCurrency(0, currency)}</span>
-                        <span>{formatCurrency(totalPaid, currency)} paid · {formatCurrency(totalBudget - totalPaid, currency)} outstanding</span>
-                        <span>{formatCurrency(totalBudget, currency)}</span>
-                    </div>
-                </div>
-            </div>
+            )}
 
             {/* Category Breakdown + Category Detail */}
             <div className="grid-2">
@@ -142,18 +169,20 @@ export default async function BudgetPage() {
                     </div>
                     <div className="panel-body">
                         {categories.length === 0 ? (
-                            <p className="text-sm text-muted">No categories yet</p>
+                            <p className="text-sm text-muted">No categories yet — add suppliers with quotes to see your breakdown.</p>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
                                 {categories.map((cat) => {
-                                    const barHeight = totalBudget > 0 ? Math.max(8, Math.round((cat.budget / totalBudget) * 180)) : 0;
+                                    const barPercent = budgetSet
+                                        ? Math.min((cat.quoted / setBudget) * 100, 100)
+                                        : totalQuoted > 0 ? (cat.quoted / totalQuoted) * 100 : 0;
                                     return (
                                         <div key={cat.name} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
                                             <span className="text-sm" style={{ width: '120px', fontWeight: 500 }}>{cat.name}</span>
                                             <div style={{ flex: 1, height: '8px', background: 'var(--color-border-light)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
-                                                <div style={{ height: '100%', width: `${totalBudget > 0 ? (cat.budget / totalBudget) * 100 : 0}%`, background: 'var(--color-sidebar)', borderRadius: 'var(--radius-full)' }} />
+                                                <div style={{ height: '100%', width: `${barPercent}%`, background: 'var(--color-sidebar)', borderRadius: 'var(--radius-full)' }} />
                                             </div>
-                                            <span className="text-sm font-bold" style={{ width: '80px', textAlign: 'right' }}>{formatCurrency(cat.budget, currency)}</span>
+                                            <span className="text-sm font-bold" style={{ width: '80px', textAlign: 'right' }}>{formatCurrency(cat.quoted, currency)}</span>
                                         </div>
                                     );
                                 })}
@@ -177,13 +206,42 @@ export default async function BudgetPage() {
                                 </div>
                                 <div className="category-amount">
                                     <div className="category-amount-value">{formatCurrency(cat.paid, currency)}</div>
-                                    <div className="category-amount-total">of {formatCurrency(cat.budget, currency)}</div>
+                                    <div className="category-amount-total">of {formatCurrency(cat.quoted, currency)} quoted</div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
+
+            {/* Per-event breakdown */}
+            {eventBudgets.length > 0 && (
+                <div className="panel">
+                    <div className="panel-header">
+                        <div className="panel-title">By Ceremony</div>
+                    </div>
+                    <div className="panel-body">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                            {eventBudgets.map((ev) => {
+                                const evPercent = ev.quoted > 0 ? Math.round((ev.paid / ev.quoted) * 100) : 0;
+                                return (
+                                    <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                                        <Link href={`/dashboard/events/${ev.id}`} className="text-sm" style={{ width: '140px', fontWeight: 500 }}>
+                                            {ev.name}
+                                        </Link>
+                                        <div style={{ flex: 1, height: '8px', background: 'var(--color-border-light)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
+                                            <div style={{ height: '100%', width: `${evPercent}%`, background: 'var(--color-paid)', borderRadius: 'var(--radius-full)' }} />
+                                        </div>
+                                        <span className="text-sm" style={{ width: '160px', textAlign: 'right' }}>
+                                            {formatCurrency(ev.paid, currency)} / {formatCurrency(ev.quoted, currency)}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
