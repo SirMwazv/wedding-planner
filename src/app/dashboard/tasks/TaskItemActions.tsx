@@ -41,15 +41,13 @@ export default function TaskItemActions({ task }: TaskItemActionsProps) {
                         <button
                             onClick={handleDelete}
                             disabled={loading}
-                            className="btn btn-sm"
-                            style={{ background: 'var(--color-danger)', color: 'white', fontSize: '11px', padding: '2px 8px' }}
+                            className="btn btn-danger btn-sm"
                         >
                             {loading ? '...' : 'Delete'}
                         </button>
                         <button
                             onClick={() => setConfirming(false)}
-                            className="btn btn-ghost btn-sm"
-                            style={{ fontSize: '11px', padding: '2px 8px' }}
+                            className="btn btn-secondary btn-sm"
                         >
                             Cancel
                         </button>
@@ -59,7 +57,6 @@ export default function TaskItemActions({ task }: TaskItemActionsProps) {
                         <button
                             onClick={() => setShowEdit(true)}
                             className="btn btn-ghost btn-sm"
-                            style={{ fontSize: '11px', padding: '2px 6px', opacity: 0.6 }}
                             title="Edit task"
                         >
                             ✏️
@@ -67,7 +64,7 @@ export default function TaskItemActions({ task }: TaskItemActionsProps) {
                         <button
                             onClick={() => setConfirming(true)}
                             className="btn btn-ghost btn-sm"
-                            style={{ color: 'var(--color-danger)', fontSize: '11px', padding: '2px 6px', opacity: 0.6 }}
+                            style={{ color: 'var(--color-danger)' }}
                             title="Delete task"
                         >
                             🗑️

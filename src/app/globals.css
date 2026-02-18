@@ -913,6 +913,39 @@ table {
   cursor: not-allowed;
 }
 
+.btn-danger {
+  background: var(--color-danger, #ef4444);
+  color: white;
+  border: 1px solid var(--color-danger, #ef4444);
+}
+
+.btn-danger:hover {
+  opacity: 0.85;
+}
+
+.btn-outline-danger {
+  background: transparent;
+  color: var(--color-danger, #ef4444);
+  border: 1px solid var(--color-danger, #ef4444);
+}
+
+.btn-outline-danger:hover {
+  background: var(--color-danger, #ef4444);
+  color: white;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ─── Tables ─── */
 .table-container {
   overflow-x: auto;

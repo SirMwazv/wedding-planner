@@ -1,27 +1,31 @@
 'use client';
 
 import { useState } from 'react';
-import { deleteEvent } from '@/lib/actions/events';
+import { deleteSupplier } from '@/lib/actions/suppliers';
 
-export default function EventActions({ eventId }: { eventId: string }) {
+interface SupplierDeleteProps {
+    supplierId: string;
+}
+
+export default function SupplierDelete({ supplierId }: SupplierDeleteProps) {
     const [confirming, setConfirming] = useState(false);
     const [loading, setLoading] = useState(false);
 
     async function handleDelete() {
         setLoading(true);
-        const result = await deleteEvent(eventId);
+        const result = await deleteSupplier(supplierId);
         if (result?.error) {
             alert(result.error);
             setLoading(false);
             setConfirming(false);
         }
-        // deleteEvent redirects on success
+        // deleteSupplier redirects on success
     }
 
     if (confirming) {
         return (
             <div className="flex items-center gap-2">
-                <span className="text-sm" style={{ color: 'var(--color-danger)' }}>Delete this event?</span>
+                <span className="text-sm" style={{ color: 'var(--color-danger)' }}>Delete this supplier?</span>
                 <button
                     onClick={handleDelete}
                     disabled={loading}
