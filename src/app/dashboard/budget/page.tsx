@@ -13,23 +13,31 @@ export default async function BudgetPage() {
 
     const { couple } = coupleData;
     const currency = couple.primary_currency as Currency;
-    const setBudget = Number(couple.total_budget) || 0;
-    const events = await getEvents();
+    const events = await getEvents() as Array<{ id: string; name: string; type: string; budget?: number; currency?: string }>;
     const suppliers = await getAllSuppliers();
 
-    // Totals
-    const totalQuoted = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-        sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.amount), 0), 0);
-    const totalPaid = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-        sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_paid), 0), 0);
-    const outstanding = totalQuoted - totalPaid;
+    // Per-event data
+    const eventData = events.map((e) => {
+        const eventSuppliers = suppliers.filter((s: { event_id: string }) => s.event_id === e.id);
+        const quoted = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
+            sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.amount), 0), 0);
+        const paid = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
+            sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_paid), 0), 0);
+        const budget = Number(e.budget) || 0;
+        const overBudget = budget > 0 && quoted > budget;
+        return { id: e.id, name: e.name, type: e.type, budget, quoted, paid, overBudget };
+    });
 
-    // Budget tracking
-    const budgetSet = setBudget > 0;
-    const remaining = budgetSet ? setBudget - totalQuoted : 0;
-    const overBudget = budgetSet && totalQuoted > setBudget;
-    const quotedPercent = budgetSet ? Math.min(Math.round((totalQuoted / setBudget) * 100), 100) : 0;
-    const paidPercent = budgetSet ? Math.min(Math.round((totalPaid / setBudget) * 100), 100) : 0;
+    // Totals across all events
+    const totalBudget = eventData.reduce((s, e) => s + e.budget, 0);
+    const totalQuoted = eventData.reduce((s, e) => s + e.quoted, 0);
+    const totalPaid = eventData.reduce((s, e) => s + e.paid, 0);
+    const outstanding = totalQuoted - totalPaid;
+    const budgetSet = totalBudget > 0;
+    const remaining = budgetSet ? totalBudget - totalQuoted : 0;
+    const overBudget = budgetSet && totalQuoted > totalBudget;
+    const quotedPercent = budgetSet ? Math.min(Math.round((totalQuoted / totalBudget) * 100), 100) : 0;
+    const paidPercent = budgetSet ? Math.min(Math.round((totalPaid / totalBudget) * 100), 100) : 0;
 
     // Category breakdown
     const categoryMap: Record<string, { quoted: number; paid: number }> = {};
@@ -50,25 +58,20 @@ export default async function BudgetPage() {
         }))
         .sort((a, b) => b.quoted - a.quoted);
 
-    // Per-event breakdown
-    const eventBudgets = events.map((e: { id: string; name: string; type: string }) => {
-        const eventSuppliers = suppliers.filter((s: { event_id: string }) => s.event_id === e.id);
-        const quoted = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-            sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.amount), 0), 0);
-        const paid = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-            sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_paid), 0), 0);
-        return { id: e.id, name: e.name, quoted, paid, type: e.type };
-    });
-
     return (
         <>
             <div className="page-header">
                 <div>
                     <h2>Budget</h2>
-                    <p>Financial overview across all events</p>
+                    <p>Financial overview across all ceremonies</p>
                 </div>
                 <div className="page-header-actions">
-                    <BudgetActions currentBudget={setBudget} currencySymbol={currency} />
+                    <BudgetActions events={events.map((e) => ({
+                        eventId: e.id,
+                        eventName: e.name,
+                        currentBudget: Number(e.budget) || 0,
+                        currencySymbol: currency,
+                    }))} />
                 </div>
             </div>
 
@@ -77,7 +80,7 @@ export default async function BudgetPage() {
                 <div className="panel" style={{ borderLeft: '4px solid var(--color-gold)', marginBottom: 'var(--space-lg)' }}>
                     <div className="panel-body">
                         <p style={{ margin: 0 }}>
-                            <strong>🎯 No budget set yet.</strong> Click &quot;Set Budget&quot; above to define your wedding budget and start tracking costs against it.
+                            <strong>🎯 No budgets set yet.</strong> Click &quot;Set Budgets&quot; above to define a budget for each ceremony.
                         </p>
                     </div>
                 </div>
@@ -87,19 +90,19 @@ export default async function BudgetPage() {
                 <div className="panel" style={{ borderLeft: '4px solid var(--color-danger)', marginBottom: 'var(--space-lg)' }}>
                     <div className="panel-body">
                         <p style={{ margin: 0 }}>
-                            <strong>⚠️ Over budget!</strong> Your quoted costs exceed your set budget by {formatCurrency(totalQuoted - setBudget, currency)}.
+                            <strong>⚠️ Over budget!</strong> Your total quoted costs exceed your combined budget by {formatCurrency(totalQuoted - totalBudget, currency)}.
                         </p>
                     </div>
                 </div>
             )}
 
-            {/* Stat Cards */}
+            {/* Overall Stat Cards */}
             <div className="stats-grid">
                 <div className="stat-card">
                     <div className="stat-icon">🎯</div>
-                    <div className="stat-value">{budgetSet ? formatCurrency(setBudget, currency) : '—'}</div>
-                    <div className="stat-label">Set Budget</div>
-                    <div className="stat-subtitle">{budgetSet ? 'Your target' : 'Not set yet'}</div>
+                    <div className="stat-value">{budgetSet ? formatCurrency(totalBudget, currency) : '—'}</div>
+                    <div className="stat-label">Total Budget</div>
+                    <div className="stat-subtitle">{budgetSet ? `Across ${events.length} ${events.length === 1 ? 'ceremony' : 'ceremonies'}` : 'Not set yet'}</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-icon">📋</div>
@@ -155,7 +158,56 @@ export default async function BudgetPage() {
                             <span>
                                 {formatCurrency(totalPaid, currency)} paid · {formatCurrency(outstanding, currency)} outstanding
                             </span>
-                            <span>{formatCurrency(setBudget, currency)}</span>
+                            <span>{formatCurrency(totalBudget, currency)}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Per-Event Budget Breakdown */}
+            {eventData.length > 0 && (
+                <div className="panel">
+                    <div className="panel-header">
+                        <div className="panel-title">Budget by Ceremony</div>
+                    </div>
+                    <div className="panel-body">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
+                            {eventData.map((ev) => {
+                                const evBudgetSet = ev.budget > 0;
+                                const evQuotedPct = evBudgetSet ? Math.min(Math.round((ev.quoted / ev.budget) * 100), 100) : 0;
+                                const evPaidPct = evBudgetSet ? Math.min(Math.round((ev.paid / ev.budget) * 100), 100) : 0;
+                                return (
+                                    <div key={ev.id}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 'var(--space-xs)' }}>
+                                            <Link href={`/dashboard/events/${ev.id}`} style={{ fontWeight: 600 }}>
+                                                {ev.name}
+                                            </Link>
+                                            <div className="text-sm">
+                                                {evBudgetSet ? (
+                                                    <span>
+                                                        {ev.overBudget && <span style={{ color: 'var(--color-danger)' }}>⚠️ </span>}
+                                                        {formatCurrency(ev.quoted, currency)} / {formatCurrency(ev.budget, currency)}
+                                                        <span className="text-muted"> budget</span>
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-muted">No budget set · {formatCurrency(ev.quoted, currency)} quoted</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {evBudgetSet && (
+                                            <div style={{ height: '8px', background: 'var(--color-border-light)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
+                                                <div style={{ display: 'flex', height: '100%' }}>
+                                                    <div style={{ width: `${evPaidPct}%`, background: 'var(--color-paid)', transition: 'width 0.3s' }} />
+                                                    <div style={{ width: `${Math.max(0, evQuotedPct - evPaidPct)}%`, background: 'var(--color-committed)', transition: 'width 0.3s' }} />
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="text-xs text-muted" style={{ marginTop: 'var(--space-xs)' }}>
+                                            {formatCurrency(ev.paid, currency)} paid {evBudgetSet && `· ${formatCurrency(ev.budget - ev.quoted, currency)} remaining`}
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -174,7 +226,7 @@ export default async function BudgetPage() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
                                 {categories.map((cat) => {
                                     const barPercent = budgetSet
-                                        ? Math.min((cat.quoted / setBudget) * 100, 100)
+                                        ? Math.min((cat.quoted / totalBudget) * 100, 100)
                                         : totalQuoted > 0 ? (cat.quoted / totalQuoted) * 100 : 0;
                                     return (
                                         <div key={cat.name} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
@@ -213,35 +265,6 @@ export default async function BudgetPage() {
                     </div>
                 </div>
             </div>
-
-            {/* Per-event breakdown */}
-            {eventBudgets.length > 0 && (
-                <div className="panel">
-                    <div className="panel-header">
-                        <div className="panel-title">By Ceremony</div>
-                    </div>
-                    <div className="panel-body">
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                            {eventBudgets.map((ev) => {
-                                const evPercent = ev.quoted > 0 ? Math.round((ev.paid / ev.quoted) * 100) : 0;
-                                return (
-                                    <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-                                        <Link href={`/dashboard/events/${ev.id}`} className="text-sm" style={{ width: '140px', fontWeight: 500 }}>
-                                            {ev.name}
-                                        </Link>
-                                        <div style={{ flex: 1, height: '8px', background: 'var(--color-border-light)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
-                                            <div style={{ height: '100%', width: `${evPercent}%`, background: 'var(--color-paid)', borderRadius: 'var(--radius-full)' }} />
-                                        </div>
-                                        <span className="text-sm" style={{ width: '160px', textAlign: 'right' }}>
-                                            {formatCurrency(ev.paid, currency)} / {formatCurrency(ev.quoted, currency)}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )}
         </>
     );
 }

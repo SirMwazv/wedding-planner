@@ -50,7 +50,6 @@ export interface Couple {
   id: string;
   name: string;
   primary_currency: Currency;
-  total_budget: number;
   invite_code?: string; // Optional because old records might have it null before migration completion or if we select partial columns
   created_at: string;
   updated_at: string;
@@ -72,6 +71,7 @@ export interface Event {
   date: string | null;
   location: string | null;
   currency: Currency;
+  budget: number;
   notes: string | null;
   created_at: string;
   updated_at: string;

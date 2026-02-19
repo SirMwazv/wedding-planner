@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getCurrentCouple } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export async function updateBudget(amount: number) {
+export async function updateEventBudget(eventId: string, amount: number) {
     const coupleData = await getCurrentCouple();
     if (!coupleData) return { error: 'No couple found' };
 
@@ -14,9 +14,9 @@ export async function updateBudget(amount: number) {
 
     const supabase = await createClient();
     const { error } = await supabase
-        .from('couples')
-        .update({ total_budget: amount })
-        .eq('id', coupleData.couple.id);
+        .from('events')
+        .update({ budget: amount })
+        .eq('id', eventId);
 
     if (error) {
         return { error: error.message };
