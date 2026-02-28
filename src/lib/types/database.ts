@@ -85,10 +85,12 @@ export interface Supplier {
   contact_name: string | null;
   phone: string | null;
   whatsapp_number: string | null;
-  instagram_handle: string | null;
+  social_media: string | null;
   email: string | null;
   notes: string | null;
   status: SupplierStatus;
+  quoted_amount: number;
+  paid_amount: number;
   created_at: string;
   updated_at: string;
 }
@@ -169,10 +171,12 @@ export interface CreateSupplierData {
   contact_name?: string;
   phone?: string;
   whatsapp_number?: string;
-  instagram_handle?: string;
+  social_media?: string;
   email?: string;
   notes?: string;
   status?: SupplierStatus;
+  quoted_amount?: number;
+  paid_amount?: number;
 }
 
 export interface CreateQuoteData {

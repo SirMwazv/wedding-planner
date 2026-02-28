@@ -4,7 +4,7 @@ import { getEvents } from '@/lib/actions/events';
 import { getAllSuppliers } from '@/lib/actions/suppliers';
 import { formatCurrency } from '@/lib/utils/currency';
 import Link from 'next/link';
-import type { Currency, Quote, Supplier } from '@/lib/types/database';
+import type { Currency, Supplier } from '@/lib/types/database';
 import BudgetActions from './BudgetActions';
 
 export default async function BudgetPage() {
@@ -19,10 +19,10 @@ export default async function BudgetPage() {
     // Per-event data
     const eventData = events.map((e) => {
         const eventSuppliers = suppliers.filter((s: { event_id: string }) => s.event_id === e.id);
-        const quoted = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-            sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.amount), 0), 0);
-        const paid = eventSuppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-            sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_paid), 0), 0);
+        const quoted = eventSuppliers.reduce((sum: number, s: Supplier) =>
+            sum + Number(s.quoted_amount || 0), 0);
+        const paid = eventSuppliers.reduce((sum: number, s: Supplier) =>
+            sum + Number(s.paid_amount || 0), 0);
         const budget = Number(e.budget) || 0;
         const overBudget = budget > 0 && quoted > budget;
         return { id: e.id, name: e.name, type: e.type, budget, quoted, paid, overBudget };
@@ -41,13 +41,11 @@ export default async function BudgetPage() {
 
     // Category breakdown
     const categoryMap: Record<string, { quoted: number; paid: number }> = {};
-    suppliers.forEach((s: Supplier & { quotes?: Quote[] }) => {
+    suppliers.forEach((s: Supplier) => {
         const cat = s.category || 'Other';
         if (!categoryMap[cat]) categoryMap[cat] = { quoted: 0, paid: 0 };
-        (s.quotes || []).forEach((q: Quote) => {
-            categoryMap[cat].quoted += Number(q.amount) || 0;
-            categoryMap[cat].paid += Number(q.deposit_paid) || 0;
-        });
+        categoryMap[cat].quoted += Number(s.quoted_amount) || 0;
+        categoryMap[cat].paid += Number(s.paid_amount) || 0;
     });
 
     const categories = Object.entries(categoryMap)

@@ -47,10 +47,12 @@ export async function createSupplier(formData: FormData) {
         contact_name: (formData.get('contact_name') as string) || undefined,
         phone: (formData.get('phone') as string) || undefined,
         whatsapp_number: (formData.get('whatsapp_number') as string) || undefined,
-        instagram_handle: (formData.get('instagram_handle') as string) || undefined,
+        social_media: (formData.get('social_media') as string) || undefined,
         email: (formData.get('email') as string) || undefined,
         notes: (formData.get('notes') as string) || undefined,
         status: (formData.get('status') as SupplierStatus) || 'researching',
+        quoted_amount: parseFloat(formData.get('quoted_amount') as string) || 0,
+        paid_amount: parseFloat(formData.get('paid_amount') as string) || 0,
     };
 
     const { error } = await supabase.from('suppliers').insert(supplierData);
@@ -69,10 +71,12 @@ export async function updateSupplier(id: string, formData: FormData) {
         contact_name: (formData.get('contact_name') as string) || null,
         phone: (formData.get('phone') as string) || null,
         whatsapp_number: (formData.get('whatsapp_number') as string) || null,
-        instagram_handle: (formData.get('instagram_handle') as string) || null,
+        social_media: (formData.get('social_media') as string) || null,
         email: (formData.get('email') as string) || null,
         notes: (formData.get('notes') as string) || null,
         status: formData.get('status') as SupplierStatus,
+        quoted_amount: parseFloat(formData.get('quoted_amount') as string) || 0,
+        paid_amount: parseFloat(formData.get('paid_amount') as string) || 0,
     };
 
     const { error } = await supabase

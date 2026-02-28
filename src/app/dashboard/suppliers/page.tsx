@@ -4,7 +4,7 @@ import { getAllSuppliers } from '@/lib/actions/suppliers';
 import { getEvents } from '@/lib/actions/events';
 import { formatCurrency } from '@/lib/utils/currency';
 import Link from 'next/link';
-import type { Currency, Quote, Supplier, SupplierStatus } from '@/lib/types/database';
+import type { Currency, Supplier, SupplierStatus } from '@/lib/types/database';
 import SupplierTable from './SupplierTable';
 import SuccessToast from '@/components/SuccessToast';
 import { Suspense } from 'react';
@@ -19,16 +19,16 @@ export default async function SuppliersPage() {
     const events = await getEvents();
 
     // Totals
-    const totalQuoted = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-        sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.amount), 0), 0);
-    const totalPaid = suppliers.reduce((sum: number, s: Supplier & { quotes?: Quote[] }) =>
-        sum + (s.quotes || []).reduce((qs: number, q: Quote) => qs + Number(q.deposit_paid), 0), 0);
+    const totalQuoted = suppliers.reduce((sum: number, s: Supplier) =>
+        sum + Number(s.quoted_amount || 0), 0);
+    const totalPaid = suppliers.reduce((sum: number, s: Supplier) =>
+        sum + Number(s.paid_amount || 0), 0);
     const totalOutstanding = totalQuoted - totalPaid;
 
     // Prepare table data
-    const tableData = suppliers.map((s: Supplier & { quotes?: Quote[]; events?: { name: string } }) => {
-        const quoted = (s.quotes || []).reduce((sum: number, q: Quote) => sum + Number(q.amount), 0);
-        const paid = (s.quotes || []).reduce((sum: number, q: Quote) => sum + Number(q.deposit_paid), 0);
+    const tableData = suppliers.map((s: Supplier & { events?: { name: string } }) => {
+        const quoted = Number(s.quoted_amount || 0);
+        const paid = Number(s.paid_amount || 0);
         return {
             id: s.id,
             name: s.name,

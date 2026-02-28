@@ -2525,3 +2525,95 @@ tbody tr:last-child td {
   max-width: 420px;
   padding: var(--space-lg);
 }
+
+/* ─── Inspiration Gallery ─── */
+.inspiration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-lg);
+}
+
+.inspiration-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.inspiration-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.inspiration-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.inspiration-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.inspiration-card:hover .inspiration-image {
+  transform: scale(1.05);
+}
+
+.inspiration-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: var(--space-sm);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.inspiration-card:hover .inspiration-overlay {
+  opacity: 1;
+}
+
+.inspiration-delete-btn {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  color: white;
+}
+
+.inspiration-delete-btn:hover {
+  background: var(--color-danger);
+}
+
+.inspiration-caption {
+  padding: var(--space-md) var(--space-md) var(--space-xs);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.inspiration-date {
+  padding: 0 var(--space-md) var(--space-md);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .inspiration-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-md);
+  }
+}

@@ -124,13 +124,27 @@ export default function NewSupplierForm({ events }: Props) {
 
                         <div className="form-row">
                             <div className="form-group">
-                                <label className="form-label" htmlFor="instagram_handle">Instagram</label>
-                                <input id="instagram_handle" name="instagram_handle" type="text" className="form-input" placeholder="nomsacatering" />
+                                <label className="form-label" htmlFor="social_media">Social Media</label>
+                                <input id="social_media" name="social_media" type="text" className="form-input" placeholder="e.g. @nomsacatering or https://..." />
                             </div>
 
                             <div className="form-group">
                                 <label className="form-label" htmlFor="email">Email</label>
                                 <input id="email" name="email" type="email" className="form-input" placeholder="vendor@example.com" />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="quoted_amount">Quoted Amount</label>
+                                <input id="quoted_amount" name="quoted_amount" type="number" step="0.01" className="form-input" placeholder="0.00" defaultValue="0" />
+                                <span className="form-hint">Amount quoted by supplier</span>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="paid_amount">Paid Amount</label>
+                                <input id="paid_amount" name="paid_amount" type="number" step="0.01" className="form-input" placeholder="0.00" defaultValue="0" />
+                                <span className="form-hint">Amount actually paid</span>
                             </div>
                         </div>
 

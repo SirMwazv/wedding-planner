@@ -1,10 +1,10 @@
 import { getSupplier } from '@/lib/actions/suppliers';
-import { SUPPLIER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '@/lib/types/database';
-import { formatCurrency, formatDate, formatRelativeDate } from '@/lib/utils/currency';
+import { SUPPLIER_STATUS_LABELS } from '@/lib/types/database';
+import { formatCurrency } from '@/lib/utils/currency';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { SupplierStatus, Currency, PaymentMethod } from '@/lib/types/database';
-import SupplierActions from './SupplierActions';
+import QuoteCards from './QuoteCards';
 import SupplierDelete from './SupplierDelete';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -29,9 +29,11 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
         contact_name: string | null;
         phone: string | null;
         whatsapp_number: string | null;
-        instagram_handle: string | null;
+        social_media: string | null;
         email: string | null;
         notes: string | null;
+        quoted_amount: number;
+        paid_amount: number;
         events?: { name: string; type: string; currency: string };
         quotes?: Array<{
             id: string;
@@ -132,11 +134,11 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
                                 </div>
                             </div>
                         )}
-                        {s.instagram_handle && (
+                        {s.social_media && (
                             <div className="list-item">
                                 <div className="list-item-content">
-                                    <div className="list-item-subtitle">Instagram</div>
-                                    <div className="list-item-title">📷 @{s.instagram_handle}</div>
+                                    <div className="list-item-subtitle">Social Media</div>
+                                    <div className="list-item-title">🌐 {s.social_media}</div>
                                 </div>
                             </div>
                         )}
@@ -148,7 +150,7 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
                                 </div>
                             </div>
                         )}
-                        {!s.contact_name && !s.phone && !s.whatsapp_number && !s.instagram_handle && !s.email && (
+                        {!s.contact_name && !s.phone && !s.whatsapp_number && !s.social_media && !s.email && (
                             <p className="text-sm text-muted">No contact information added yet.</p>
                         )}
                     </div>
@@ -169,91 +171,12 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
                 </div>
             </div>
 
-            {/* Quotes */}
-            <div className="panel">
-                <div className="panel-header">
-                    <span className="panel-title">Quotes ({quotes.length})</span>
-                    <SupplierActions supplierId={s.id} eventCurrency={eventCurrency} />
-                </div>
-                <div className="panel-body">
-                    {quotes.length === 0 ? (
-                        <p className="text-sm text-muted">No quotes yet. Add a quote to start tracking costs.</p>
-                    ) : (
-                        quotes.map((q) => (
-                            <div key={q.id} className="card mb-md" style={{ background: 'var(--color-bg)' }}>
-                                <div className="flex-between mb-md">
-                                    <div>
-                                        <div style={{ fontWeight: 700, fontSize: 'var(--text-xl)', fontFamily: 'var(--font-mono)' }}>
-                                            {formatCurrency(Number(q.amount), q.currency as Currency)}
-                                        </div>
-                                        {q.due_date && (
-                                            <div className="text-xs text-muted">Due: {formatRelativeDate(q.due_date)}</div>
-                                        )}
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        {q.is_accepted && <span className="badge badge-success"><span className="badge-dot" />Accepted</span>}
-                                        {q.quote_file_url && (
-                                            <a href={q.quote_file_url} target="_blank" rel="noopener" className="btn btn-ghost btn-sm mt-sm">
-                                                📄 View File
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="grid-3" style={{ marginBottom: 'var(--space-sm)' }}>
-                                    <div>
-                                        <div className="text-xs text-muted">Deposit Required</div>
-                                        <div className="font-mono text-sm">{formatCurrency(Number(q.deposit_required), q.currency as Currency)}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-xs text-muted">Paid</div>
-                                        <div className="font-mono text-sm" style={{ color: 'var(--color-success)' }}>
-                                            {formatCurrency(Number(q.deposit_paid), q.currency as Currency)}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="text-xs text-muted">Outstanding</div>
-                                        <div className="font-mono text-sm" style={{ color: Number(q.outstanding_balance) > 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>
-                                            {formatCurrency(Number(q.outstanding_balance), q.currency as Currency)}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {Number(q.amount) > 0 && (
-                                    <div className="progress-bar" style={{ marginBottom: 'var(--space-sm)' }}>
-                                        <div
-                                            className={`progress-bar-fill ${Number(q.deposit_paid) >= Number(q.amount) ? 'success' :
-                                                Number(q.deposit_paid) > 0 ? 'warning' : ''
-                                                }`}
-                                            style={{ width: `${Math.min(100, (Number(q.deposit_paid) / Number(q.amount)) * 100)}%` }}
-                                        />
-                                    </div>
-                                )}
-
-                                {q.notes && <p className="text-xs text-muted">{q.notes}</p>}
-
-                                {/* Payments */}
-                                {(q.payments || []).length > 0 && (
-                                    <div style={{ marginTop: 'var(--space-md)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-sm)' }}>
-                                        <div className="text-xs text-muted mb-md" style={{ fontWeight: 600 }}>PAYMENTS</div>
-                                        {(q.payments || []).map((p) => (
-                                            <div key={p.id} className="list-item">
-                                                <div className="list-item-content">
-                                                    <div className="list-item-title font-mono">{formatCurrency(Number(p.amount), p.currency as Currency)}</div>
-                                                    <div className="list-item-subtitle">
-                                                        {formatDate(p.paid_at)} · {PAYMENT_METHOD_LABELS[p.method]}
-                                                        {p.reference && <> · Ref: {p.reference}</>}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))
-                    )}
-                </div>
-            </div>
+            {/* Quotes — fully interactive client component */}
+            <QuoteCards
+                supplierId={s.id}
+                eventCurrency={eventCurrency}
+                quotes={quotes}
+            />
         </>
     );
 }

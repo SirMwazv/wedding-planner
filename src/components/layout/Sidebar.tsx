@@ -18,6 +18,7 @@ export default function Sidebar({ coupleName, weddingDate }: SidebarProps) {
         { href: '/dashboard/events', label: 'Events', icon: '📅' },
         { href: '/dashboard/suppliers', label: 'Suppliers', icon: '👥' },
         { href: '/dashboard/budget', label: 'Budget', icon: '💼' },
+        { href: '/dashboard/inspiration', label: 'Inspiration', icon: '📸' },
         { href: '/dashboard/tasks', label: 'Tasks', icon: '✅' },
     ];
 
