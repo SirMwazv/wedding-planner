@@ -17,6 +17,8 @@ interface TaskEditProps {
         description: string | null;
         due_date: string | null;
         assigned_to: string | null;
+        is_milestone?: boolean;
+        sort_order?: number;
     };
     members: Member[];
     onClose: () => void;
@@ -97,6 +99,21 @@ export default function TaskEdit({ task, members, onClose }: TaskEditProps) {
                                     </option>
                                 ))}
                             </select>
+                        </div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label className="form-label milestone-toggle" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', cursor: 'pointer' }}>
+                                <input name="is_milestone" type="checkbox" value="true" defaultChecked={task.is_milestone || false} style={{ width: '18px', height: '18px' }} />
+                                🏁 Mark as Milestone
+                            </label>
+                            <span className="form-hint">Milestones appear on the jubilee line timeline</span>
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label" htmlFor="edit_sort_order">Timeline Order</label>
+                            <input id="edit_sort_order" name="sort_order" type="number" className="form-input" defaultValue={task.sort_order || 0} min="0" />
+                            <span className="form-hint">Lower = earlier on the timeline</span>
                         </div>
                     </div>
 

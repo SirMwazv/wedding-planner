@@ -25,6 +25,8 @@ type Task = {
     status: string;
     due_date: string | null;
     assigned_to: string | null;
+    is_milestone?: boolean;
+    sort_order?: number;
     events?: { name: string; couple_id?: string };
 };
 
@@ -142,6 +144,7 @@ export default async function TasksPage() {
                                                 />
                                                 <div className="task-content">
                                                     <div className={`task-title ${isCompleted ? 'completed' : ''}`}>
+                                                        {task.is_milestone && <span title="Milestone" style={{ marginRight: 'var(--space-xs)' }}>🏁</span>}
                                                         {task.title}
                                                     </div>
                                                     {task.description && (

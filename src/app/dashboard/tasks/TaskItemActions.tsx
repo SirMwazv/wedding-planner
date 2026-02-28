@@ -18,6 +18,8 @@ interface TaskItemActionsProps {
         description: string | null;
         due_date: string | null;
         assigned_to: string | null;
+        is_milestone?: boolean;
+        sort_order?: number;
     };
     members: Member[];
 }

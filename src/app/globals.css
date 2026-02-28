@@ -2617,3 +2617,254 @@ tbody tr:last-child td {
     gap: var(--space-md);
   }
 }
+
+/* ─── Jubilee Line (Milestone Timeline) ─── */
+.jubilee-line {
+  padding: var(--space-md) 0;
+}
+
+.jubilee-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.jubilee-track {
+  position: relative;
+  height: 44px;
+  margin: 0 16px;
+}
+
+.jubilee-rail {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: var(--radius-full);
+}
+
+.jubilee-rail-filled {
+  transition: width 0.5s ease;
+  z-index: 1;
+}
+
+.jubilee-node {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.jubilee-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.jubilee-dot-completed {
+  box-shadow: 0 0 0 3px var(--color-success-bg);
+}
+
+.jubilee-dot-active {
+  box-shadow: 0 0 0 3px var(--color-warning-bg);
+  animation: jubilee-pulse 2s ease-in-out infinite;
+}
+
+@keyframes jubilee-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px var(--color-warning-bg);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(234, 179, 8, 0.15);
+  }
+}
+
+.jubilee-label {
+  margin-top: var(--space-xs);
+  text-align: center;
+  width: max-content;
+  max-width: 100px;
+}
+
+.jubilee-label-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.jubilee-label-title.completed {
+  color: var(--color-text-tertiary);
+  text-decoration: line-through;
+}
+
+.jubilee-label-date {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  margin-top: 1px;
+}
+
+.jubilee-empty {
+  padding: var(--space-md);
+  text-align: center;
+}
+
+/* Compact mode for dashboard cards */
+.jubilee-compact .jubilee-track {
+  height: 24px;
+  margin: 0 10px;
+}
+
+.jubilee-compact .jubilee-dot {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.jubilee-compact .jubilee-dot svg {
+  width: 7px;
+  height: 7px;
+}
+
+.jubilee-compact-summary {
+  text-align: center;
+  margin-top: var(--space-xs);
+}
+
+/* ─── Event Dashboard Cards ─── */
+.event-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.event-dashboard-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.event-dashboard-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.event-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.event-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.event-card-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.event-card-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.event-card-countdown {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.event-card-days {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
+.event-card-days-label {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.event-card-date {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.event-card-timeline {
+  margin-bottom: var(--space-md);
+  border-top: 1px solid var(--color-border-light);
+  padding-top: var(--space-sm);
+}
+
+.event-card-budget {
+  margin-bottom: var(--space-md);
+}
+
+.event-card-budget-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-xs);
+}
+
+.event-card-budget-amounts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+}
+
+.event-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border-light);
+}
+
+@media (max-width: 768px) {
+  .event-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Form hint styling */
+.form-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}

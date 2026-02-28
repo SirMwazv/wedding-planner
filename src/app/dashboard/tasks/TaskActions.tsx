@@ -96,6 +96,21 @@ export default function TaskActions({ events, members }: TaskActionsProps) {
                                 </div>
                             </div>
 
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label className="form-label milestone-toggle" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', cursor: 'pointer' }}>
+                                        <input name="is_milestone" type="checkbox" value="true" style={{ width: '18px', height: '18px' }} />
+                                        🏁 Mark as Milestone
+                                    </label>
+                                    <span className="form-hint">Milestones appear on the jubilee line timeline</span>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label" htmlFor="sort_order">Timeline Order</label>
+                                    <input id="sort_order" name="sort_order" type="number" className="form-input" defaultValue="0" min="0" />
+                                    <span className="form-hint">Lower = earlier on the timeline</span>
+                                </div>
+                            </div>
+
                             <div className="flex gap-sm">
                                 <button type="submit" className="btn btn-primary" disabled={loading}>
                                     {loading ? 'Adding...' : 'Add Task'}
